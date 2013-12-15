@@ -1,0 +1,1 @@
+<div>Добро пожаловать, <?php echo $user->user_login; ?></div>

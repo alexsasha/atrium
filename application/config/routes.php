@@ -40,7 +40,12 @@
 
 // $route['default_controller'] = "welcome";
 // $route['404_override'] = '';
-$route['default_controller'] = '';
+$route['default_controller'] = 'templater';
+
+$route['admin/(:any)/(:any)'] = "admin/$1/$2";
+$route['admin/(:any)'] = "admin/$1";
+$route['(\d+)'] = "templater/index/$1";
+$route['(:any)/(:any)'] = "templater/$1/$2";
 
 
 /* End of file routes.php */

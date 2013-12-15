@@ -1,84 +1,76 @@
 <?php 
 
 class Query extends CI_Model {
-	var $post_table;
+
+    var $timezones, $date_format;
+    var $post_table = 'posts'; 
+    var $post_statuses = array('trash', 'publish');
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->database();
-		$this->post_table = 'posts';
-    	$this->db->dbprefix($this->post_table);
+        $this->db->dbprefix($this->post_table);
+
+        $this->timezones = $this->config->get("timezones");        
+        $this->date_format = $this->config->get("date_format");        
 	}
-
-	public function pars_args($args, $defaults) {
-		if (is_array($defaults))
-			return array_merge($defaults, $args);
-	}
-
-	public function rus2translit($string) 
-	{
-        $converter = array(
-            'а' => 'a', 'б' => 'b', 'в' => 'v',
-            'г' => 'g', 'д' => 'd', 'е' => 'e',
-            'ё' => 'e', 'ж' => 'zh', 'з' => 'z',
-            'и' => 'i', 'й' => 'y', 'к' => 'k',
-            'л' => 'l', 'м' => 'm', 'н' => 'n',
-            'о' => 'o', 'п' => 'p', 'р' => 'r',
-            'с' => 's', 'т' => 't', 'у' => 'u',
-            'ф' => 'f', 'х' => 'h', 'ц' => 'c',
-            'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch',
-            'ь' => '\'', 'ы' => 'y', 'ъ' => '\'',
-            'э' => 'e', 'ю' => 'yu', 'я' => 'ya',
-            'А' => 'A', 'Б' => 'B', 'В' => 'V',
-            'Г' => 'G', 'Д' => 'D', 'Е' => 'E',
-            'Ё' => 'E', 'Ж' => 'Zh', 'З' => 'Z',
-            'И' => 'I', 'Й' => 'Y', 'К' => 'K',
-            'Л' => 'L', 'М' => 'M', 'Н' => 'N',
-            'О' => 'O', 'П' => 'P', 'Р' => 'R',
-            'С' => 'S', 'Т' => 'T', 'У' => 'U',
-            'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C',
-            'Ч' => 'Ch', 'Ш' => 'Sh', 'Щ' => 'Sch',
-            'Ь' => '\'', 'Ы' => 'Y', 'Ъ' => '\'',
-            'Э' => 'E', 'Ю' => 'Yu', 'Я' => 'Ya',
-        );
-        return strtr($string, $converter);
-    }
-
 
 	public function get_posts($args = array())
     {
+        $this->load->helper('array');
+
     	$defaults = array(  
 	        'numberposts' => 10, 
 	        'offset' => 0,  
-	        'orderby' => 'post_date',  
+	        'orderby' => 'post_date',
 	        'order' => 'DESC',
-	        'post_status' => 'publish'
+            'post_status' => 'publish'
 	    ); 
-    	$r = $this->pars_args($args, $defaults);
+    	$r = pars_args($args, $defaults);
     	$table = $this->post_table;
 
     	if($r['numberposts'] != -1)
     		$this->db->limit($r['numberposts'], $r['offset']);
-    	
-
-    	$this->db->where('post_status', $r['post_status']);
     	$this->db->order_by($r['orderby'], $r['order']);
-    	$query = $this->db->get($table);
+        
+        unset($r['orderby'], $r['order'], $r['offset'], $r['numberposts']);
+    	
+        $query = $this->db->get_where($table, $r);
     	
     	return $query->result();
     }
 
-    public function get_posts_number()
+    public function get_user_posts_number($user_id)
+    {
+        return $this->get_posts_number(array('post_author' => $user_id));
+    }
+
+    public function get_post($id)
     {
     	$table = $this->post_table;
-    	$count = $this->db->count_all($table);
-    	return $count;
+    	$query = $this->db->get_where($table, array("ID" => $id));
+        
+        $r = $query->result();
+        if($r)
+    	   return $r[0];
+
+        return FALSE;
+    }
+
+
+    public function get_posts_number($args = array())
+    {
+        $args['numberposts'] = -1;
+    	$posts = $this->get_posts($args);
+    	
+        return count($posts);
     }
 
     public function update_post($args = array()) 
     {
-    	$current_date = date("Y-m-d H:i:s");
+        $date_format = 'Y-m-d H:i:s'; //use defined date format for DB
+    	$current_date = gmdate($date_format);
     	$table = $this->post_table;
     	
 	    //если определен ID, то обновляем запись
@@ -90,6 +82,8 @@ class Query extends CI_Model {
 	    }
 	    else
 	    {
+            $this->load->helper(array('array', 'url'));
+
 	    	$defaults = array(
 		        'post_content' => '',
 		        'post_title' => '',
@@ -98,13 +92,63 @@ class Query extends CI_Model {
 		        'post_date' => $current_date,
 		        'post_modified' => $current_date
 		    );
-		    $r = $this->pars_args($args, $defaults);
+		    $r = pars_args($args, $defaults);
 		    
 		    $this->load->helper('url');
 		    if($r['post_name'] === '' && $r['post_title'] !== '')
-				$r['post_name'] = url_title($this->rus2translit($r['post_title']), '-', TRUE);
+				$r['post_name'] = url_title(rus2translit($r['post_title']), '-', TRUE);
 
 			$this->db->insert($table, $r);
 	    }
+    }
+
+    public function delete_post($id)
+    {
+        if($this->post_exists($id)) 
+        {
+            $table = $this->post_table;
+            return $this->db->delete($table, array('ID' => $id)); 
+        } 
+        else 
+        {
+            return FALSE;
+        }
+    }
+
+    public function change_post_status($id, $status)
+    {
+        if($this->post_exists($id) && in_array($status, $this->post_statuses)) 
+        {
+            $table = $this->post_table;
+            $args['post_status'] = $status;
+            $this->db->update($table, $args, array('ID' => $id));
+        } 
+        else 
+        {
+            return FALSE;
+        }
+    }
+
+    public function get_post_date($post_id, $date_format = NULL)
+    {
+        $post = $this->get_post($post_id);
+        if( ! $post)
+            return FALSE;
+        if( ! $date_format)
+            $date_format = $this->date_format;
+
+        $timezones = $this->timezones;
+        $this->load->helper('date');
+
+        return gmt_to_local_date($date_format, $post->post_date, $timezones);
+    }
+
+    public function post_exists($id) 
+    {
+        $table = $this->post_table;
+        $this->db->select('ID');
+        $query = $this->db->get_where($table, array("ID" => $id));
+    
+        return $query->result();
     }
 }
