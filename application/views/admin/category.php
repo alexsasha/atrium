@@ -1,28 +1,42 @@
-<?php echo validation_errors(); ?>
+<div class="container" id="category">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="page-header">
+				<h2>Категории <small>(<?php echo $terms_count; ?>)</small> <a href="<?php echo site_url('admin/term_create'); ?>" class="btn btn-default btn-sm" role="button">Добавить <span class="glyphicon glyphicon-plus"></span></a></h2>
+			</div>
+		</div>
 
-<?php echo form_open('admin/category'); ?>
+		<?php if($terms): ?>
 
-	<div><input type="text" name="name" value="<?php echo set_value('name'); ?>" size="50" placeholder="Название"/></div>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Название</th>
+						<th>Описание</th>
+						<th>Ярлык</th>
+						<th class="function-cell">-</th>
+					</tr>
+				</thead>
+				<tbody>
 
-	<div><input type="text" name="slug" value="<?php echo set_value('slug'); ?>" size="50" placeholder="Ярлык"/></div>
+				<?php foreach ($terms as $term): ?>
 
-	<div><textarea name="desc" id="desc" cols="30" rows="10" placeholder="Содержание"><?php echo set_value('desc'); ?></textarea></div>
+				    <tr>
+				    	<td><a href=""><?php echo $term->name; ?></a></td>
+				    	<td><?php echo $term->description; ?></td>
+				    	<td><?php echo $term->slug; ?></td>
+						<td class="function-cell">
+					    	<a href="<?php echo site_url('admin/term_update/' . $term->term_id); ?>" class="glyphicon glyphicon-pencil"></a>
+					    	<a href="<?php echo site_url('admin/term_delete/' . $term->term_id);?>" class="glyphicon glyphicon-remove" title="Удалить" onclick="if (!confirm('Вы уверены, что хотите удалить категорию?')) return false;"></a>
+					    </td>
+				    </tr>
 
-	<div><input type="submit" value="Добавить новую категорию" /></div>
+				<?php endforeach ?>
 
-</form>
-
-<?php if($terms): ?>
-
-	<?php foreach ($terms as $term): ?>
-
-	    <div class="item">
-	    	<div><?php echo $term->name; ?></div>
-	    	<a href="<?php echo site_url('admin/term_update/' . $term->term_id);?>">Изменить</a>|
-	    	<a href="<?php echo site_url('admin/term_delete/' . $term->term_id);?>">Удалить</a>
-	    </div>
-
-	<?php endforeach ?>
-<?php else: ?>
-	<h3>Категорий не создано.</h3>
-<?php endif; ?>
+				</tbody>
+			</table>
+		<?php else: ?>
+			<h3 class="alert alert-warning">Категорий не создано.</h3>
+		<?php endif; ?>
+	</div>
+</div>

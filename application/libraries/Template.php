@@ -13,7 +13,7 @@ class Template {
 	public function get($template, $data = NULL)
 	{	
 		if (!$this->template_exists($template)) 
-			return false;
+			return FALSE;
 
 		$view = $this->controller_path . '/' . $template;
 		$this->CI->load->view($view, $data);

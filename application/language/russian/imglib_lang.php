@@ -1,23 +1,25 @@
 <?php
 
-$lang['imglib_source_image_required'] = "You must specify a source image in your preferences.";
-$lang['imglib_gd_required'] = "The GD image library is required for this feature.";
-$lang['imglib_gd_required_for_props'] = "Your server must support the GD image library in order to determine the image properties.";
-$lang['imglib_unsupported_imagecreate'] = "Your server does not support the GD function required to process this type of image.";
-$lang['imglib_gif_not_supported'] = "GIF images are often not supported due to licensing restrictions.  You may have to use JPG or PNG images instead.";
-$lang['imglib_jpg_not_supported'] = "JPG images are not supported.";
-$lang['imglib_png_not_supported'] = "PNG images are not supported.";
-$lang['imglib_jpg_or_png_required'] = "The image resize protocol specified in your preferences only works with JPEG or PNG image types.";
-$lang['imglib_copy_error'] = "An error was encountered while attempting to replace the file.  Please make sure your file directory is writable.";
-$lang['imglib_rotate_unsupported'] = "Image rotation does not appear to be supported by your server.";
-$lang['imglib_libpath_invalid'] = "The path to your image library is not correct.  Please set the correct path in your image preferences.";
-$lang['imglib_image_process_failed'] = "Image processing failed.  Please verify that your server supports the chosen protocol and that the path to your image library is correct.";
-$lang['imglib_rotation_angle_required'] = "An angle of rotation is required to rotate the image.";
-$lang['imglib_writing_failed_gif'] = "GIF image.";
-$lang['imglib_invalid_path'] = "The path to the image is not correct.";
-$lang['imglib_copy_failed'] = "The image copy routine failed.";
-$lang['imglib_missing_font'] = "Unable to find a font to use.";
-$lang['imglib_save_failed'] = "Unable to save the image.  Please make sure the image and file directory are writable.";
+$lang['imglib_source_image_required'] = 'Укажите имя файла исходного изображения.';
+$lang['imglib_gd_required'] = 'Для выполнения этой операции необходима библиотека GD.';
+$lang['imglib_gd_required_for_props'] = 'На вашем сервере должна быть установлена библиотека GD для получения значений свойств изображений.';
+$lang['imglib_unsupported_imagecreate'] = 'На вашем сервере отсутствует функция поддержки работы с данным типом изображения.';
+$lang['imglib_gif_not_supported'] = 'Обычно поддержка изображений GIF отсутствует в связи с лицензионными ограничениями.  Вместо этого вы можете использовать JPG или PNG.';
+$lang['imglib_jpg_not_supported'] = 'Не установлена поддержка JPG';
+$lang['imglib_png_not_supported'] = 'Не установлена поддержка PNG';
+$lang['imglib_jpg_or_png_required'] = 'Выбранная вами библиотека обработки изображений поддерживает только JPG или PNG-файлы.';
+$lang['imglib_copy_error'] = 'Ошибка при попытке перезаписать файл.  Убедитесь, что для этой директории разрешена запись.';
+$lang['imglib_rotate_unsupported'] = 'Похоже, что поворот изображения не поддерживается библиотекой.';
+$lang['imglib_libpath_invalid'] = 'Путь к библиотеке обработки изображений некорректен.  Пожалуйста, исправьте его.';
+$lang['imglib_image_process_failed'] = 'Невозможно обработать изображение.  Убедитесь, что ваш сервер поддерживает выбранный вами пакет для обработки изображений, а также правильность пути к этим пакетам.';
+$lang['imglib_rotation_angle_required'] = 'Необходимо указать значение угла для осуществления поворота изображения.';
+$lang['imglib_writing_failed_gif'] = 'изображение GIF'; // Упоминаний об этой ошибке в файлах кода нет, поэтому неясно, что имел ввиду ее автор :)
+$lang['imglib_invalid_path'] = 'Путь к изображению некорректен.';
+$lang['imglib_copy_failed'] = 'Невозможно выполнить функцию копирования файла изображения.';
+$lang['imglib_missing_font'] = 'Шрифт не найден.';
+$lang['imglib_save_failed'] = "Невозможно сохранить изображение. Пожалуйста убедитесь, что изображение и папка доступны для записи.";
+
+
 
 
 /* End of file imglib_lang.php */

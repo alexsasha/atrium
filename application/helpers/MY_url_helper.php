@@ -35,12 +35,18 @@ function sanitize($string)
     return url_title(rus2translit($string), '-', TRUE);
 }
 
-function redirect_login() 
+
+function redirect_admin($action = '', $http_response_code = 301) 
 {
-    redirect('/admin/login/', 'location', 301);
+    redirect('/admin/' . $action, 'location', $http_response_code);
 }
 
-function redirect_admin() 
+function redirect_login() 
 {
-    redirect('/admin/', 'location', 301);
+    redirect_admin('login');
+}
+
+function template_url()
+{
+    return base_url() . 'application/views/template';
 }

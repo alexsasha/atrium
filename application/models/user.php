@@ -2,12 +2,12 @@
 
 class User extends CI_Model {
 	
-	var $user_table = 'users';
-	var $user_roles = array(
+	var $user_table = 'users',
+	$user_roles = array(
 		0 => 'guest',
 		1 => 'admin'
-	);
-	var $default_user_status = 0;
+	),
+	$default_user_status = 0;
 
 	public function __construct()
 	{
@@ -62,10 +62,23 @@ class User extends CI_Model {
 		return FALSE;
 	}
 
+	public function get_users_number() 
+	{
+		$terms = $this->get_users();
+        
+        if($terms)
+        {
+        	return count($terms);
+        }
+        else
+        {
+        	return 0;
+        }
+	}
+
 	public function update_user($args) 
 	{
 		$date_format = 'Y-m-d H:i:s'; //use defined date format for DB
-    	$current_date = gmdate($date_format);
     	$table = $this->user_table;
 
 	    if(isset($args['ID']))
@@ -76,6 +89,7 @@ class User extends CI_Model {
 	    else
 	    {
             $this->load->helper(array('array', 'url'));
+    		$current_date = gmdate($date_format);
 
 	    	$defaults = array(
 		        'user_registered' => $current_date,
@@ -84,7 +98,10 @@ class User extends CI_Model {
 
 		    $r = pars_args($args, $defaults);
 		    
-			$this->db->insert($table, $r);
+			if($this->db->insert($table, $r))
+	        {
+	            return $this->db->insert_id();
+	        }
 	    }
 	}
 
@@ -104,48 +121,52 @@ class User extends CI_Model {
 
 	public function check_login($login, $pass) 
 	{
-		if($login && $pass)
-		{
-			$this->load->library('encrypt');
 
-			$table = $this->user_table;
+		if( ! $login || ! $pass)
+			return FALSE;
 
-	        $query = $this->db->get_where(
-	        	$table, 
-	        	array(
-	        		'user_login' => $login
-	        	)
-	    	);
+		$this->load->library('encrypt');
 
-	    	$user = $query->result();
-	    	$user = $user[0];
+		$table = $this->user_table;
 
-	    	$encrypted_pass = $user->user_pass;
-	    	$decoded_pass = $this->encrypt->decode($encrypted_pass);
+        $query = $this->db->get_where(
+        	$table, 
+        	array(
+        		'user_login' => $login
+        	)
+    	);
 
-	    	if($decoded_pass === $pass)
-	        	return $user;
-		}
+    	$user = $query->result();
+    	if( ! $user)
+    		return FALSE;
+    	
+    	$user = $user[0];
 
-		return FALSE;
+    	$encrypted_pass = $user->user_pass;
+    	$decoded_pass = $this->encrypt->decode($encrypted_pass);
+
+    	if($decoded_pass === $pass)
+        	return $user;
+
+        return FALSE;
 	}
 
 	public function authenticate($login, $pass)
 	{
 		$user = $this->check_login($login, $pass);
-		if($user)
-		{
-			$this->load->library('encrypt');
+		if( ! $user)
+			return FALSE;
+		
+		$this->load->library('encrypt');
 
-			$userdata = array(
-              	'ID'  => $user->ID,
-              	'user_login'  => $user->user_login,
-               	'user_status'     => $user->user_status,
-               	'logged_in' => TRUE
-           	);
+		$userdata = array(
+          	'ID'          => $user->ID,
+          	'user_login'  => $user->user_login,
+           	'user_status' => $user->user_status,
+           	'logged_in'   => TRUE
+       	);
 
-			return $this->session->set_userdata($userdata);
-		}
+		return $this->session->set_userdata($userdata);
 	}
 
 	public function de_authenticate()
@@ -163,11 +184,11 @@ class User extends CI_Model {
 		return $this->session->userdata('logged_in');
 	}
 
-	public function user_role($user_status)
+	public function user_role($user_status = NULL)
 	{
 		$user_roles = $this->user_roles;
 
-    	if(isset($user_status) && $user_roles)
+    	if($user_status !== NULL && $user_roles)
     		return $user_roles[$user_status];
 	}
 
@@ -178,5 +199,4 @@ class User extends CI_Model {
 		return $this->is_user_logged_in() &&
 				$this->user_role($user_status) == 'admin';
 	}
-
 }
